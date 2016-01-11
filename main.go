@@ -98,14 +98,9 @@ func main() {
 	apps := caching.GetAllApp()
 	logging.LogStd(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)), true)
 
-	// Ticker Pooling the CC every X sec
-	ccPooling := time.NewTicker(*tickerTime)
-
-	go func() {
-		for range ccPooling.C {
-			apps = caching.GetAllApp()
-		}
-	}()
+	//Let's start the goRoutine
+	caching.PerformPoollingCaching(*tickerTime)
+	caching.PerformStat()
 
 	// Parse extra fields from cmd call
 	extraFields, err := extrafields.ParseExtraFields(*extraFields)

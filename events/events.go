@@ -7,6 +7,7 @@ import (
 	"github.com/shinji62/firehose-to-fluentd/caching"
 	log "github.com/shinji62/firehose-to-fluentd/logging"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -18,6 +19,7 @@ type Event struct {
 
 var selectedEvents map[string]bool
 var selectedEventsCount map[string]uint64 = make(map[string]uint64)
+var mutex sync.Mutex
 
 func RouteEvents(in chan *events.Envelope, extraFields map[string]string) {
 	for msg := range in {
@@ -57,9 +59,10 @@ func routeEvent(msg *events.Envelope, extraFields map[string]string) {
 		event.AnnotateWithAppData()
 		event.AnnotateWithMetaData(extraFields)
 		event.AnnotateWithTag()
+		mutex.Lock()
 		event.ShipEvent()
-
 		selectedEventsCount[eventType.String()]++
+		mutex.Unlock()
 	}
 }
 
@@ -354,26 +357,31 @@ func LogEventTotals(logTotalsTime time.Duration, dopplerEndpoint string) {
 			elapsedTime := time.Since(startTime).Seconds()
 			totalElapsedTime := time.Since(totalTime).Seconds()
 			startTime = time.Now()
-			output, lastCount := getEventTotals(totalElapsedTime, elapsedTime, count, dopplerEndpoint)
+			event, lastCount := getEventTotals(totalElapsedTime, elapsedTime, count, dopplerEndpoint)
 			count = lastCount
-			log.LogStd(output, true)
+			event.ShipEvent()
 		}
 	}()
 }
 
-func getEventTotals(totalElapsedTime float64, elapsedTime float64, lastCount uint64, dopplerEndpoint string) (string, uint64) {
-	selectedEvents := GetSelectedEventsCount()
+func getEventTotals(totalElapsedTime float64, elapsedTime float64, lastCount uint64, dopplerEndpoint string) (Event, uint64) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	totalCount := GetTotalCountOfSelectedEvents()
 	sinceLastTime := float64(int(elapsedTime*10)) / 10
-	sinceStartTime := float64(int(totalElapsedTime*10)) / 10
+	var event Event
+	event.Type = "firehose_to_fluentd_stats"
+	event.Msg = "Statistic for firehose to fluentd"
 
-	var s string
-	s = fmt.Sprintln(s,
-		"\nWe have processed", totalCount-lastCount, "events from the firehose at",
-		dopplerEndpoint, "over the last", sinceLastTime, "seconds and", totalCount, "total events since startup")
-	s = fmt.Sprintln(s, "\nAnd of those events, we have processed\n")
-	for event, count := range selectedEvents {
-		s = fmt.Sprintln(s, "\n", count, event, "over the last", sinceStartTime, "seconds")
+	fields := logrus.Fields{
+		"doppler":       dopplerEndpoint,
+		"total_count":   totalCount,
+		"by_sec_Events": int((totalCount - lastCount) / uint64(sinceLastTime)),
 	}
-	return s, totalCount
+
+	event.Fields = fields
+	//	for event, count := range selectedEvents {
+	//		event.Fields[event] = count
+	//	}
+	return event, totalCount
 }

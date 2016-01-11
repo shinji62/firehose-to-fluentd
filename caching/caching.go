@@ -6,6 +6,8 @@ import (
 	cfClient "github.com/cloudfoundry-community/go-cfclient"
 	json "github.com/pquerna/ffjson/ffjson"
 	log "github.com/shinji62/firehose-to-fluentd/logging"
+	"os"
+	"time"
 )
 
 type App struct {
@@ -30,6 +32,34 @@ func CreateBucket() {
 
 	})
 
+}
+
+func PerformPoollingCaching(tickerTime time.Duration) {
+	// Ticker Pooling the CC every X sec
+	ccPooling := time.NewTicker(tickerTime)
+
+	var apps []App
+	go func() {
+		for range ccPooling.C {
+			apps = GetAllApp()
+		}
+	}()
+
+}
+
+func PerformStat() {
+	go func() {
+		// Grab the initial stats.
+		prev := appdb.Stats()
+
+		for {
+			time.Sleep(60 * time.Second)
+			stats := appdb.Stats()
+			diff := stats.Sub(&prev)
+			json.NewEncoder(os.Stderr).Encode(diff)
+			prev = stats
+		}
+	}()
 }
 
 func FillDatabase(listApps []App) {
