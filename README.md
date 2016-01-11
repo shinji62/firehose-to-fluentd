@@ -139,8 +139,8 @@ We match the ValueMetric and HttpStartStop and send to files.
 
 
 # Docker (tested with docker 1.9.X / Kitematic)
-We use DockerInDocker to built the image
-Since is around 7MG
+I use DockerInDocker to built the image
+Builded size is around 7MG
 
 * For Github Master branch Image
 ```bash
@@ -194,6 +194,15 @@ Showing top 10 nodes out of 44 (cum >= 20ms)
 
 For Mac OSX golang profiling do not work.
 
+
+#TBD
+
+* Support Multiple Fluentd Endpoint  (Failover / RB)
+* Bosh release
+
+
+
 # Thanks to
 
 * Forked from firehose-to-syslog
+

@@ -1,0 +1,87 @@
+{
+	"ImportPath": "github.com/shinji62/firehose-to-fluentd",
+	"GoVersion": "go1.5.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.7.2-4-gcdd90c3",
+			"Rev": "cdd90c38c6e3718c731b555b9c3ed1becebec3ba"
+		},
+		{
+			"ImportPath": "github.com/alecthomas/template",
+			"Rev": "b867cc6ab45cece8143cfcc6fc9c77cf3f2c23c0"
+		},
+		{
+			"ImportPath": "github.com/alecthomas/units",
+			"Rev": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
+		},
+		{
+			"ImportPath": "github.com/boltdb/bolt",
+			"Comment": "v1.0-47-g4d30731",
+			"Rev": "4d30731e9122988d2012a9574c43f80f054a0d3b"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-community/go-cfclient",
+			"Rev": "86f916674beeb109fa1a0842c128e61b5db41950"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa",
+			"Rev": "280497e4cd656fbf56aac4de5f0ad25f2d68758d"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
+			"Rev": "3d364d9ed49fee2f9fdcba278199127462cae3c4"
+		},
+		{
+			"ImportPath": "github.com/evalphobia/logrus_fluent",
+			"Rev": "be0a83a41666e4cd30fd2ca19c6d6740ec823b6f"
+		},
+		{
+			"ImportPath": "github.com/fluent/fluent-logger-golang/fluent",
+			"Comment": "v1.0.0-7-g063f6e4",
+			"Rev": "063f6e4cb426934cbc3164c911ad8af2fa475c48"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/proto",
+			"Rev": "8edb24c179ed858a38f18920d9005c2dde05ec17"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "2dbddebb8266b93c5e6b119efb54e89043186f3f"
+		},
+		{
+			"ImportPath": "github.com/philhofer/fwd",
+			"Rev": "f429d72be3997413f67cdb6e3c87bfc72475e717"
+		},
+		{
+			"ImportPath": "github.com/pkg/profile",
+			"Rev": "c795610ec6e479e5795f7852db65ea15073674a6"
+		},
+		{
+			"ImportPath": "github.com/pquerna/ffjson/ffjson",
+			"Rev": "184f78649ba053f484de46921391e6d0c6f5172f"
+		},
+		{
+			"ImportPath": "github.com/pquerna/ffjson/fflib/v1",
+			"Rev": "184f78649ba053f484de46921391e6d0c6f5172f"
+		},
+		{
+			"ImportPath": "github.com/tinylib/msgp/msgp",
+			"Comment": "v1.0-beta-4-g0d29f4b",
+			"Rev": "0d29f4bb1d9c5d1ad8ad54e0507ca54c0fa50482"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "7dbad50ab5b31073856416cdcfeb2796d682f844"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "ec6d5d770f531108a6464462b2201b74fcd09314"
+		},
+		{
+			"ImportPath": "gopkg.in/alecthomas/kingpin.v2",
+			"Comment": "v2.0.8",
+			"Rev": "a7274600e78d26876a32d8b293cbb0cd324f61a2"
+		}
+	]
+}

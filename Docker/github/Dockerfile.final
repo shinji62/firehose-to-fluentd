@@ -1,0 +1,8 @@
+FROM scratch
+
+MAINTAINER GWENN ETOURNEAU <gwenn.etourneau@gmail.com>
+
+ADD firehose-to-fluentd /
+
+CMD []
+ENTRYPOINT ["/firehose-to-fluentd"]
