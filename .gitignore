@@ -1,0 +1,10 @@
+firehose-to-fluentd*
+events/events.test
+.project
+*.swp
+.#*
+\#*
+my.db
+start-firehose.sh
+dist
+*pprof
