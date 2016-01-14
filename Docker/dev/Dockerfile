@@ -1,4 +1,4 @@
-FROM golang:1.5.2
+FROM golang:1.5.3
 MAINTAINER Gwenn Etourneau <gwenn.etourneau@gmail.com>
 RUN mkdir -p /gopath/bin/
 RUN go get github.com/tools/godep

@@ -324,7 +324,10 @@ func (e *Event) AnnotateWithAppData() {
 }
 
 func (e *Event) AnnotateWithTag() {
-	e.Fields["tag"] = fmt.Sprintf("%s.%s", e.Fields["cf_origin"], e.Fields["event_type"])
+	if e.Fields["cf_origin"] != nil && e.Fields["event_type"] != nil {
+		e.Fields["tag"] = fmt.Sprintf("%s.%s", e.Fields["cf_origin"], e.Fields["event_type"])
+
+	}
 }
 
 func (e *Event) AnnotateWithMetaData(extraFields map[string]string) {
