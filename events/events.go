@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/shinji62/firehose-to-fluentd/caching"
 	log "github.com/shinji62/firehose-to-fluentd/logging"
+	"github.com/shinji62/firehose-to-fluentd/utils"
 	"strings"
 	"sync"
 	"time"
@@ -127,13 +128,13 @@ func HttpStart(msg *events.Envelope) Event {
 
 	fields := logrus.Fields{
 		"origin":            msg.GetOrigin(),
-		"cf_app_id":         httpStart.GetApplicationId(),
+		"cf_app_id":         utils.FormatUUID(httpStart.GetApplicationId()),
 		"instance_id":       httpStart.GetInstanceId(),
 		"instance_index":    httpStart.GetInstanceIndex(),
 		"method":            httpStart.GetMethod().String(),
-		"parent_request_id": httpStart.GetParentRequestId(),
+		"parent_request_id": utils.FormatUUID(httpStart.GetParentRequestId()),
 		"peer_type":         httpStart.GetPeerType().String(),
-		"request_id":        httpStart.GetRequestId(),
+		"request_id":        utils.FormatUUID(httpStart.GetRequestId()),
 		"remote_addr":       httpStart.GetRemoteAddress(),
 		"timestamp":         httpStart.GetTimestamp(),
 		"uri":               httpStart.GetUri(),
@@ -152,10 +153,10 @@ func HttpStop(msg *events.Envelope) Event {
 
 	fields := logrus.Fields{
 		"origin":         msg.GetOrigin(),
-		"cf_app_id":      httpStop.GetApplicationId(),
+		"cf_app_id":      utils.FormatUUID(httpStop.GetApplicationId()),
 		"content_length": httpStop.GetContentLength(),
 		"peer_type":      httpStop.GetPeerType().String(),
-		"request_id":     httpStop.GetRequestId(),
+		"request_id":     utils.FormatUUID(httpStop.GetRequestId()),
 		"status_code":    httpStop.GetStatusCode(),
 		"timestamp":      httpStop.GetTimestamp(),
 		"uri":            httpStop.GetUri(),
@@ -173,15 +174,15 @@ func HttpStartStop(msg *events.Envelope) Event {
 
 	fields := logrus.Fields{
 		"origin":            msg.GetOrigin(),
-		"cf_app_id":         httpStartStop.GetApplicationId(),
+		"cf_app_id":         utils.FormatUUID(httpStartStop.GetApplicationId()),
 		"content_length":    httpStartStop.GetContentLength(),
 		"instance_id":       httpStartStop.GetInstanceId(),
 		"instance_index":    httpStartStop.GetInstanceIndex(),
 		"method":            httpStartStop.GetMethod().String(),
-		"parent_request_id": httpStartStop.GetParentRequestId(),
+		"parent_request_id": utils.FormatUUID(httpStartStop.GetParentRequestId()),
 		"peer_type":         httpStartStop.GetPeerType().String(),
 		"remote_addr":       httpStartStop.GetRemoteAddress(),
-		"request_id":        httpStartStop.GetRequestId(),
+		"request_id":        utils.FormatUUID(httpStartStop.GetRequestId()),
 		"start_timestamp":   httpStartStop.GetStartTimestamp(),
 		"status_code":       httpStartStop.GetStatusCode(),
 		"stop_timestamp":    httpStartStop.GetStopTimestamp(),
@@ -289,6 +290,7 @@ func (e *Event) AnnotateWithAppData() {
 
 	cf_app_id := e.Fields["cf_app_id"]
 	appGuid := ""
+
 	if cf_app_id != nil {
 		appGuid = fmt.Sprintf("%s", cf_app_id)
 	}
