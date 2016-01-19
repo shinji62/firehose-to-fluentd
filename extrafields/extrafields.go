@@ -28,3 +28,10 @@ func ParseExtraFields(extraEventsString string) (map[string]string, error) {
 	}
 	return extraEvents, nil
 }
+
+func FieldExist(fieldList map[string]string, field string) bool {
+
+	_, presence := fieldList[field]
+	return presence
+
+}

@@ -4,7 +4,6 @@ import (
 	"github.com/cloudfoundry/noaa"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -2,10 +2,10 @@ package caching
 
 import (
 	"fmt"
+	log "github.com/Pivotal-Japan/firehose-to-fluentd/logging"
 	"github.com/boltdb/bolt"
 	cfClient "github.com/cloudfoundry-community/go-cfclient"
 	json "github.com/pquerna/ffjson/ffjson"
-	log "github.com/shinji62/firehose-to-fluentd/logging"
 	"os"
 	"time"
 )
