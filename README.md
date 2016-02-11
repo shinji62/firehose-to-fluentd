@@ -69,8 +69,8 @@ We have 3 caching strategies:
 
 
     # Setup repo
-    go get github.com/shinji62/firehose-to-fluentd
-    cd $GOPATH/src/github.com/shinji62/firehose-to-fluentd
+    go get github.com/Pivotal-Japan/firehose-to-fluentd
+    cd $GOPATH/src/github.com/Pivotal-Japan/firehose-to-fluentd
 
     # Test
 	ginkgo -r .

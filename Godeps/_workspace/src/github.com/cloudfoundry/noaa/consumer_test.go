@@ -17,7 +17,6 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -236,7 +235,7 @@ var _ = Describe("Noaa", func() {
 
 						var err error
 						Eventually(errorChan).Should(Receive(&err))
-						Expect(err.Error()).To(ContainSubstring("EOF"))
+						Expect(err.Error()).To(ContainSubstring("websocket: close 1000"))
 
 						close(done)
 					})
@@ -649,7 +648,7 @@ var _ = Describe("Noaa", func() {
 
 				var err error
 				Eventually(streamErrorChan).Should(Receive(&err))
-				Expect(err.Error()).To(ContainSubstring("EOF"))
+				Expect(err.Error()).To(ContainSubstring("websocket: close 1000"))
 
 				close(done)
 			})
@@ -1079,13 +1078,18 @@ var _ = Describe("Noaa", func() {
 		var streamErrorChan chan error
 		var finishedChan chan struct{}
 
-		perform := func() {
+		performWithIdleTimeout := func(idleTimeout time.Duration) {
 			streamErrorChan = make(chan error, 10)
 			cnsmr = noaa.NewConsumer(trafficControllerUrl, tlsSettings, consumerProxyFunc)
+			cnsmr.SetIdleTimeout(idleTimeout)
 			go func() {
 				streamErrorChan <- cnsmr.FirehoseWithoutReconnect("subscription-id", authToken, incomingChan)
 				close(finishedChan)
 			}()
+		}
+
+		perform := func() {
+			performWithIdleTimeout(0)
 		}
 
 		BeforeEach(func() {
@@ -1177,6 +1181,17 @@ var _ = Describe("Noaa", func() {
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(ContainSubstring("You are not authorized. Helpful message"))
 				})
+			})
+		})
+
+		Context("when the connection read takes too long", func() {
+			It("returns an error when the idle timeout expires", func() {
+				performWithIdleTimeout(time.Millisecond * 500)
+				var err error
+
+				Eventually(streamErrorChan).Should(Receive(&err))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("i/o timeout"))
 			})
 		})
 
