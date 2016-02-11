@@ -1,32 +1,32 @@
 {
-	"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd",
+	"ImportPath": "github.com/shinji62/firehose-to-fluentd",
 	"GoVersion": "go1.5.3",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.8.7-53-g446d1c1",
-			"Rev": "446d1c146faa8ed3f4218f056fcd165f6bcfda81"
+			"Comment": "v0.7.2-4-gcdd90c3",
+			"Rev": "cdd90c38c6e3718c731b555b9c3ed1becebec3ba"
 		},
 		{
 			"ImportPath": "github.com/alecthomas/template",
-			"Rev": "14fd436dd20c3cc65242a9f396b61bfc8a3926fc"
+			"Rev": "b867cc6ab45cece8143cfcc6fc9c77cf3f2c23c0"
 		},
 		{
 			"ImportPath": "github.com/alecthomas/units",
-			"Rev": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+			"Rev": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
 		},
 		{
 			"ImportPath": "github.com/boltdb/bolt",
-			"Comment": "v1.1.0-57-g4030e7f",
-			"Rev": "4030e7fbc16465ec02334c93396b57629438096e"
+			"Comment": "v1.0-47-g4d30731",
+			"Rev": "4d30731e9122988d2012a9574c43f80f054a0d3b"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry-community/go-cfclient",
-			"Rev": "113da20ed641ca3d56d09feec2ee37bda591f820"
+			"Rev": "86f916674beeb109fa1a0842c128e61b5db41950"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/noaa",
-			"Rev": "855293e2ad9f30d965db8827e81cf132e3764802"
+			"Rev": "280497e4cd656fbf56aac4de5f0ad25f2d68758d"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
@@ -43,53 +43,27 @@
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
-			"Comment": "v0.1-115-gc57e439",
-			"Rev": "c57e439bad574c2e0877ff18d514badcfced004d"
+			"Rev": "8edb24c179ed858a38f18920d9005c2dde05ec17"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "3986be78bf859e01f01af631ad76da5b269d270c"
+			"Rev": "2dbddebb8266b93c5e6b119efb54e89043186f3f"
 		},
 		{
 			"ImportPath": "github.com/philhofer/fwd",
 			"Rev": "f429d72be3997413f67cdb6e3c87bfc72475e717"
 		},
 		{
-			"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd/caching",
-			"Rev": "6910303bb41dbf66010fa86bb380f646f6cbd4e4"
-		},
-		{
-			"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd/events",
-			"Rev": "6910303bb41dbf66010fa86bb380f646f6cbd4e4"
-		},
-		{
-			"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd/extrafields",
-			"Rev": "6910303bb41dbf66010fa86bb380f646f6cbd4e4"
-		},
-		{
-			"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd/firehose",
-			"Rev": "6910303bb41dbf66010fa86bb380f646f6cbd4e4"
-		},
-		{
-			"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd/logging",
-			"Rev": "6910303bb41dbf66010fa86bb380f646f6cbd4e4"
-		},
-		{
-			"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd/utils",
-			"Rev": "6910303bb41dbf66010fa86bb380f646f6cbd4e4"
-		},
-		{
 			"ImportPath": "github.com/pkg/profile",
-			"Comment": "v1.0.0",
 			"Rev": "c795610ec6e479e5795f7852db65ea15073674a6"
 		},
 		{
 			"ImportPath": "github.com/pquerna/ffjson/ffjson",
-			"Rev": "4a0805c1782dcdf59a133bd8c91810245d5eda4c"
+			"Rev": "184f78649ba053f484de46921391e6d0c6f5172f"
 		},
 		{
 			"ImportPath": "github.com/pquerna/ffjson/fflib/v1",
-			"Rev": "4a0805c1782dcdf59a133bd8c91810245d5eda4c"
+			"Rev": "184f78649ba053f484de46921391e6d0c6f5172f"
 		},
 		{
 			"ImportPath": "github.com/tinylib/msgp/msgp",
@@ -98,16 +72,16 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "341cd0845b5a19165f12976d7915847a71037135"
+			"Rev": "7dbad50ab5b31073856416cdcfeb2796d682f844"
 		},
 		{
 			"ImportPath": "golang.org/x/oauth2",
-			"Rev": "2baa8a1b9338cf13d9eeb27696d761155fa480be"
+			"Rev": "ec6d5d770f531108a6464462b2201b74fcd09314"
 		},
 		{
 			"ImportPath": "gopkg.in/alecthomas/kingpin.v2",
-			"Comment": "v2.1.8",
-			"Rev": "8852570bd3865e9c4d4cb7cf5001c4295b07cad5"
+			"Comment": "v2.0.8",
+			"Rev": "a7274600e78d26876a32d8b293cbb0cd324f61a2"
 		}
 	]
 }

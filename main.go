@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/caching"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/events"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/extrafields"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/firehose"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/logging"
 	"github.com/boltdb/bolt"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/profile"
+	"github.com/shinji62/firehose-to-fluentd/caching"
+	"github.com/shinji62/firehose-to-fluentd/events"
+	"github.com/shinji62/firehose-to-fluentd/extrafields"
+	"github.com/shinji62/firehose-to-fluentd/firehose"
+	"github.com/shinji62/firehose-to-fluentd/logging"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 	"os"
@@ -57,7 +57,6 @@ func main() {
 	if len(*dopplerEndpoint) > 0 {
 		cfClient.Endpoint.DopplerEndpoint = *dopplerEndpoint
 	}
-
 	logging.LogStd(fmt.Sprintf("Using %s as doppler endpoint", cfClient.Endpoint.DopplerEndpoint), true)
 
 	logging.LogStd("Setting up event routing!", true)
@@ -107,14 +106,6 @@ func main() {
 	extraFields, err := extrafields.ParseExtraFields(*extraFields)
 	if err != nil {
 		log.Fatal("Error parsing extra fields: ", err)
-		os.Exit(1)
-	}
-	if extrafields.FieldExist(extraFields, "cluster") == false {
-		log.Fatal("Error parsing extra fields Cluster is mandatory ")
-		os.Exit(1)
-	}
-	if extrafields.FieldExist(extraFields, "domain") == false {
-		log.Fatal("Error parsing extra fields domain is mandatory")
 		os.Exit(1)
 	}
 

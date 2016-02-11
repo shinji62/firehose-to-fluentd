@@ -1,9 +1,9 @@
 package extrafields_test
 
 import (
-	. "github.com/Pivotal-Japan/firehose-to-fluentd/extrafields"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/shinji62/firehose-to-fluentd/extrafields"
 	"testing"
 )
 
@@ -44,24 +44,5 @@ var _ = Describe("Extra Fields", func() {
 				Expect(err).To(HaveOccurred())
 			})
 		})
-	})
-	Describe("FieldExist", func() {
-		Context("Called with existing value", func() {
-			It("should return true", func() {
-				extraEvents := "to:many"
-				field, _ := ParseExtraFields(extraEvents)
-				Expect(FieldExist(field, "to")).To(BeTrue())
-			})
-		})
-		Context("Called with existing value", func() {
-			It("should return false", func() {
-				extraEvents := "tpo:many,test:b,foo:bar"
-				field, _ := ParseExtraFields(extraEvents)
-				Expect(FieldExist(field, "to")).To(BeFalse())
-				Expect(FieldExist(field, "t")).To(BeFalse())
-				Expect(FieldExist(field, "fo")).To(BeFalse())
-			})
-		})
-
 	})
 })

@@ -12,15 +12,6 @@ type cmdGroup struct {
 	commandOrder []*CmdClause
 }
 
-func (c *cmdGroup) defaultSubcommand() *CmdClause {
-	for _, cmd := range c.commandOrder {
-		if cmd.isDefault {
-			return cmd
-		}
-	}
-	return nil
-}
-
 func newCmdGroup(app *Application) *cmdGroup {
 	return &cmdGroup{
 		app:      app,
@@ -47,34 +38,17 @@ func (c *cmdGroup) addCommand(name, help string) *CmdClause {
 
 func (c *cmdGroup) init() error {
 	seen := map[string]bool{}
-	if c.defaultSubcommand() != nil && !c.have() {
-		return fmt.Errorf("default subcommand %q provided but no subcommands defined", c.defaultSubcommand().name)
-	}
-	defaults := []string{}
 	for _, cmd := range c.commandOrder {
-		if cmd.isDefault {
-			defaults = append(defaults, cmd.name)
-		}
 		if seen[cmd.name] {
-			return fmt.Errorf("duplicate command %q", cmd.name)
+			return fmt.Errorf("duplicate command '%s'", cmd.name)
 		}
 		seen[cmd.name] = true
-		for _, alias := range cmd.aliases {
-			if seen[alias] {
-				return fmt.Errorf("alias duplicates existing command %q", alias)
-			}
-			c.commands[alias] = cmd
-		}
 		if err := cmd.init(); err != nil {
 			return err
 		}
 	}
-	if len(defaults) > 1 {
-		return fmt.Errorf("more than one default subcommand exists: %s", strings.Join(defaults, ", "))
-	}
 	return nil
 }
-
 func (c *cmdGroup) have() bool {
 	return len(c.commands) > 0
 }
@@ -84,17 +58,15 @@ type CmdClauseValidator func(*CmdClause) error
 // A CmdClause is a single top-level command. It encapsulates a set of flags
 // and either subcommands or positional arguments.
 type CmdClause struct {
-	actionMixin
 	*flagGroup
 	*argGroup
 	*cmdGroup
 	app       *Application
 	name      string
-	aliases   []string
 	help      string
-	isDefault bool
+	action    Action
+	preAction Action
 	validator CmdClauseValidator
-	hidden    bool
 }
 
 func newCommand(app *Application, name, help string) *CmdClause {
@@ -106,12 +78,6 @@ func newCommand(app *Application, name, help string) *CmdClause {
 		name:      name,
 		help:      help,
 	}
-	return c
-}
-
-// Add an Alias for this command.
-func (c *CmdClause) Alias(name string) *CmdClause {
-	c.aliases = append(c.aliases, name)
 	return c
 }
 
@@ -136,24 +102,18 @@ func (c *CmdClause) Command(name, help string) *CmdClause {
 	return cmd
 }
 
-// Default makes this command the default if commands don't match.
-func (c *CmdClause) Default() *CmdClause {
-	c.isDefault = true
-	return c
-}
-
 func (c *CmdClause) Action(action Action) *CmdClause {
-	c.addAction(action)
+	c.action = action
 	return c
 }
 
 func (c *CmdClause) PreAction(action Action) *CmdClause {
-	c.addPreAction(action)
+	c.preAction = action
 	return c
 }
 
 func (c *CmdClause) init() error {
-	if err := c.flagGroup.init(c.app.defaultEnvarPrefix()); err != nil {
+	if err := c.flagGroup.init(); err != nil {
 		return err
 	}
 	if c.argGroup.have() && c.cmdGroup.have() {
@@ -166,9 +126,4 @@ func (c *CmdClause) init() error {
 		return err
 	}
 	return nil
-}
-
-func (c *CmdClause) Hidden() *CmdClause {
-	c.hidden = true
-	return c
 }

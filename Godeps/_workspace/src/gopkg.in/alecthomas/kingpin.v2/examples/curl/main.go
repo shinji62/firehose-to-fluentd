@@ -9,16 +9,16 @@ import (
 	"os"
 	"strings"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/alecthomas/kingpin"
 )
 
 var (
 	timeout = kingpin.Flag("timeout", "Set connection timeout.").Short('t').Default("5s").Duration()
 	headers = HTTPHeader(kingpin.Flag("headers", "Add HTTP headers to the request.").Short('H').PlaceHolder("HEADER=VALUE"))
 
-	get         = kingpin.Command("get", "GET a resource.").Default()
+	get         = kingpin.Command("get", "GET a resource.")
 	getFlag     = get.Flag("test", "Test flag").Bool()
-	getURL      = get.Command("url", "Retrieve a URL.").Default()
+	getURL      = get.Command("url", "Retrieve a URL.")
 	getURLURL   = getURL.Arg("url", "URL to GET.").Required().URL()
 	getFile     = get.Command("file", "Retrieve a file.")
 	getFileFile = getFile.Arg("file", "File to retrieve.").Required().ExistingFile()

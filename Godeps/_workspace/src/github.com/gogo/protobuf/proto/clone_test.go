@@ -35,6 +35,7 @@ import (
 	"testing"
 
 	"github.com/gogo/protobuf/proto"
+
 	proto3pb "github.com/gogo/protobuf/proto/proto3_proto"
 	pb "github.com/gogo/protobuf/proto/testdata"
 )
@@ -229,28 +230,6 @@ var mergeTests = []struct {
 			Name:       "Aaron",
 			HeightInCm: 176,
 			Data:       []byte("texas!"),
-		},
-	},
-	// Oneof fields should merge by assignment.
-	{
-		src: &pb.Communique{
-			Union: &pb.Communique_Number{Number: 41},
-		},
-		dst: &pb.Communique{
-			Union: &pb.Communique_Name{Name: "Bobby Tables"},
-		},
-		want: &pb.Communique{
-			Union: &pb.Communique_Number{Number: 41},
-		},
-	},
-	// Oneof nil is the same as not set.
-	{
-		src: &pb.Communique{},
-		dst: &pb.Communique{
-			Union: &pb.Communique_Name{Name: "Bobby Tables"},
-		},
-		want: &pb.Communique{
-			Union: &pb.Communique_Name{Name: "Bobby Tables"},
 		},
 	},
 }

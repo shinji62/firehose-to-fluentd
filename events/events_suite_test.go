@@ -1,11 +1,11 @@
 package events_test
 
 import (
-	"github.com/Pivotal-Japan/firehose-to-fluentd/events"
 	"github.com/Sirupsen/logrus"
 	. "github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/shinji62/firehose-to-fluentd/events"
 	"io/ioutil"
 	"testing"
 )
@@ -16,14 +16,6 @@ func TestEvents(t *testing.T) {
 }
 
 var _ = Describe("Events", func() {
-
-	var defaultLogrus logrus.Fields
-	BeforeEach(func() {
-
-		defaultLogrus = logrus.Fields{"cluster": "cf", "domain": "cf"}
-
-	})
-
 	Describe("GetSelectedEvents", func() {
 		Context("called with a empty list", func() {
 			It("should return a hash of only the default event", func() {
@@ -66,7 +58,7 @@ var _ = Describe("Events", func() {
 				}()
 				logrus.SetOutput(ioutil.Discard)
 				events.SetupEventRouting("")
-				events.RouteEvents(msgChan, map[string]string{"domain": "cf", "cluster": "cf"})
+				events.RouteEvents(msgChan, map[string]string{})
 			})
 			It("should return a total of 10", func() {
 				Expect(events.GetTotalCountOfSelectedEvents()).To(Equal(expected))
@@ -116,8 +108,8 @@ var _ = Describe("Events", func() {
 	Describe("AnnotateWithAppData", func() {
 		Context("called with Fields set to empty map", func() {
 			It("should do nothing", func() {
-				event := events.Event{defaultLogrus, "", "log"}
-				wanted := events.Event{logrus.Fields{"cluster": "cf", "domain": "cf", "m_host": "cf.cf"}, "", "log"}
+				event := events.Event{}
+				wanted := events.Event{}
 				event.AnnotateWithAppData()
 				Expect(event).To(Equal(wanted))
 			})
@@ -125,8 +117,8 @@ var _ = Describe("Events", func() {
 
 		Context("called with Fields set to logrus.Fields", func() {
 			It("should do nothing", func() {
-				event := events.Event{defaultLogrus, "", "log"}
-				wanted := events.Event{logrus.Fields{"cluster": "cf", "domain": "cf", "m_host": "cf.cf"}, "", "log"}
+				event := events.Event{logrus.Fields{}, "", "log"}
+				wanted := events.Event{logrus.Fields{}, "", "log"}
 				event.AnnotateWithAppData()
 				Expect(event).To(Equal(wanted))
 			})
@@ -134,9 +126,8 @@ var _ = Describe("Events", func() {
 
 		Context("called with empty cf_app_id", func() {
 			It("should do nothing", func() {
-				defaultLogrus["cf_app_id"] = ""
-				event := events.Event{defaultLogrus, "", "log"}
-				wanted := events.Event{logrus.Fields{"cluster": "cf", "domain": "cf", "cf_app_id": "", "m_host": "cf.cf"}, "", "log"}
+				event := events.Event{logrus.Fields{"cf_app_id": ""}, "", "log"}
+				wanted := events.Event{logrus.Fields{"cf_app_id": ""}, "", "log"}
 				event.AnnotateWithAppData()
 				Expect(event).To(Equal(wanted))
 			})
@@ -146,8 +137,8 @@ var _ = Describe("Events", func() {
 	Describe("AnnotateTag", func() {
 		Context("called with Fields set to empty map", func() {
 			It("should do nothing", func() {
-				event := events.Event{defaultLogrus, "", "log"}
-				wanted := events.Event{defaultLogrus, "", "log"}
+				event := events.Event{}
+				wanted := events.Event{}
 				event.AnnotateWithAppData()
 				event.AnnotateWithTag()
 				Expect(event).To(Equal(wanted))

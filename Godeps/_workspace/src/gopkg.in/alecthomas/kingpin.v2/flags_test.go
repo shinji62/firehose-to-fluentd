@@ -1,10 +1,7 @@
 package kingpin
 
 import (
-	"io/ioutil"
-	"os"
-
-	"github.com/alecthomas/assert"
+	"github.com/stretchr/testify/assert"
 
 	"testing"
 )
@@ -21,9 +18,9 @@ func TestNoBool(t *testing.T) {
 	fg := newFlagGroup()
 	f := fg.Flag("b", "").Default("true")
 	b := f.Bool()
-	fg.init("")
-	tokens := tokenize([]string{"--no-b"}, false)
-	_, err := fg.parse(tokens)
+	fg.init()
+	tokens := tokenize([]string{"--no-b"})
+	err := fg.parse(tokens)
 	assert.NoError(t, err)
 	assert.False(t, *b)
 }
@@ -32,9 +29,9 @@ func TestNegateNonBool(t *testing.T) {
 	fg := newFlagGroup()
 	f := fg.Flag("b", "")
 	f.Int()
-	fg.init("")
-	tokens := tokenize([]string{"--no-b"}, false)
-	_, err := fg.parse(tokens)
+	fg.init()
+	tokens := tokenize([]string{"--no-b"})
+	err := fg.parse(tokens)
 	assert.Error(t, err)
 }
 
@@ -47,16 +44,11 @@ func TestInvalidFlagDefaultCanBeOverridden(t *testing.T) {
 
 func TestRequiredFlag(t *testing.T) {
 	app := New("test", "")
-	app.Version("0.0.0").Writer(ioutil.Discard)
-	exits := 0
-	app.Terminate(func(int) { exits++ })
 	app.Flag("a", "").Required().Bool()
 	_, err := app.Parse([]string{"--a"})
 	assert.NoError(t, err)
 	_, err = app.Parse([]string{})
 	assert.Error(t, err)
-	_, err = app.Parse([]string{"--version"})
-	assert.Equal(t, 1, exits)
 }
 
 func TestShortFlag(t *testing.T) {
@@ -90,31 +82,4 @@ func TestCombinedShortFlagArg(t *testing.T) {
 func TestEmptyShortFlagIsAnError(t *testing.T) {
 	_, err := New("test", "").Parse([]string{"-"})
 	assert.Error(t, err)
-}
-
-func TestRequiredWithEnvarMissingErrors(t *testing.T) {
-	app := New("test", "")
-	app.Flag("t", "").OverrideDefaultFromEnvar("TEST_ENVAR").Required().Int()
-	_, err := app.Parse([]string{})
-	assert.Error(t, err)
-}
-
-func TestRequiredWithEnvar(t *testing.T) {
-	os.Setenv("TEST_ENVAR", "123")
-	app := New("test", "")
-	flag := app.Flag("t", "").Envar("TEST_ENVAR").Required().Int()
-	_, err := app.Parse([]string{})
-	assert.NoError(t, err)
-	assert.Equal(t, 123, *flag)
-}
-
-func TestRegexp(t *testing.T) {
-	app := New("test", "")
-	flag := app.Flag("reg", "").Regexp()
-	_, err := app.Parse([]string{"--reg", "^abc$"})
-	assert.NoError(t, err)
-	assert.NotNil(t, *flag)
-	assert.Equal(t, "^abc$", (*flag).String())
-	assert.Regexp(t, *flag, "abc")
-	assert.NotRegexp(t, *flag, "abcd")
 }

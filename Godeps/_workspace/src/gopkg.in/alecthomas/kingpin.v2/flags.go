@@ -37,11 +37,8 @@ func (f *flagGroup) Flag(name, help string) *FlagClause {
 	return flag
 }
 
-func (f *flagGroup) init(defaultEnvarPrefix string) error {
+func (f *flagGroup) init() error {
 	for _, flag := range f.long {
-		if defaultEnvarPrefix != "" && !flag.noEnvar && flag.envar == "" {
-			flag.envar = envarTransform(defaultEnvarPrefix + "_" + flag.name)
-		}
 		if err := flag.init(); err != nil {
 			return err
 		}
@@ -52,7 +49,7 @@ func (f *flagGroup) init(defaultEnvarPrefix string) error {
 	return nil
 }
 
-func (f *flagGroup) parse(context *ParseContext) (*FlagClause, error) {
+func (f *flagGroup) parse(context *ParseContext) error {
 	var token *Token
 
 loop:
@@ -77,12 +74,12 @@ loop:
 				}
 				flag, ok = f.long[name]
 				if !ok {
-					return nil, fmt.Errorf("unknown long flag '%s'", flagToken)
+					return fmt.Errorf("unknown long flag '%s'", flagToken)
 				}
 			} else {
 				flag, ok = f.short[name]
 				if !ok {
-					return nil, fmt.Errorf("unknown short flag '%s'", flagToken)
+					return fmt.Errorf("unknown short flag '%s'", flagToken)
 				}
 			}
 
@@ -97,26 +94,23 @@ loop:
 				}
 			} else {
 				if invert {
-					context.Push(token)
-					return nil, fmt.Errorf("unknown long flag '%s'", flagToken)
+					return fmt.Errorf("unknown long flag '%s'", flagToken)
 				}
 				token = context.Peek()
 				if token.Type != TokenArg {
-					context.Push(token)
-					return nil, fmt.Errorf("expected argument for flag '%s'", flagToken)
+					return fmt.Errorf("expected argument for flag '%s'", flagToken)
 				}
 				context.Next()
 				defaultValue = token.Value
 			}
 
 			context.matchedFlag(flag, defaultValue)
-			return flag, nil
 
 		default:
 			break loop
 		}
 	}
-	return nil, nil
+	return nil
 }
 
 func (f *flagGroup) visibleFlags() int {
@@ -132,14 +126,14 @@ func (f *flagGroup) visibleFlags() int {
 // FlagClause is a fluid interface used to build flags.
 type FlagClause struct {
 	parserMixin
-	actionMixin
 	name         string
 	shorthand    byte
 	help         string
 	envar        string
-	noEnvar      bool
 	defaultValue string
 	placeholder  string
+	action       Action
+	preAction    Action
 	hidden       bool
 }
 
@@ -175,7 +169,7 @@ func (f *FlagClause) init() error {
 	if f.value == nil {
 		return fmt.Errorf("no type defined for --%s (eg. .String())", f.name)
 	}
-	if !f.noEnvar && f.envar != "" {
+	if f.envar != "" {
 		if v := os.Getenv(f.envar); v != "" {
 			f.defaultValue = v
 		}
@@ -185,12 +179,12 @@ func (f *FlagClause) init() error {
 
 // Dispatch to the given function after the flag is parsed and validated.
 func (f *FlagClause) Action(action Action) *FlagClause {
-	f.addAction(action)
+	f.action = action
 	return f
 }
 
 func (f *FlagClause) PreAction(action Action) *FlagClause {
-	f.addPreAction(action)
+	f.preAction = action
 	return f
 }
 
@@ -200,24 +194,10 @@ func (f *FlagClause) Default(value string) *FlagClause {
 	return f
 }
 
-// DEPRECATED: Use Envar(name) instead.
+// OverrideDefaultFromEnvar overrides the default value for a flag from an
+// environment variable, if available.
 func (f *FlagClause) OverrideDefaultFromEnvar(envar string) *FlagClause {
-	return f.Envar(envar)
-}
-
-// Envar overrides the default value for a flag from an environment variable,
-// if it is set.
-func (f *FlagClause) Envar(name string) *FlagClause {
-	f.envar = name
-	f.noEnvar = false
-	return f
-}
-
-// NoEnvar forces environment variable defaults to be disabled for this flag.
-// Most useful in conjunction with app.DefaultEnvars().
-func (f *FlagClause) NoEnvar() *FlagClause {
-	f.envar = ""
-	f.noEnvar = true
+	f.envar = envar
 	return f
 }
 

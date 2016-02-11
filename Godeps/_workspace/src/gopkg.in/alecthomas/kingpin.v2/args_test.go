@@ -1,10 +1,9 @@
 package kingpin
 
 import (
-	"io/ioutil"
 	"testing"
 
-	"github.com/alecthomas/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestArgRemainder(t *testing.T) {
@@ -24,12 +23,9 @@ func TestArgRemainderErrorsWhenNotLast(t *testing.T) {
 }
 
 func TestArgMultipleRequired(t *testing.T) {
-	terminated := false
 	app := New("test", "")
-	app.Version("0.0.0").Writer(ioutil.Discard)
 	app.Arg("a", "").Required().String()
 	app.Arg("b", "").Required().String()
-	app.Terminate(func(int) { terminated = true })
 
 	_, err := app.Parse([]string{})
 	assert.Error(t, err)
@@ -37,8 +33,6 @@ func TestArgMultipleRequired(t *testing.T) {
 	assert.Error(t, err)
 	_, err = app.Parse([]string{"A", "B"})
 	assert.NoError(t, err)
-	_, err = app.Parse([]string{"--version"})
-	assert.True(t, terminated)
 }
 
 func TestInvalidArgsDefaultCanBeOverridden(t *testing.T) {

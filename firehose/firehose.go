@@ -2,9 +2,9 @@ package firehose
 
 import (
 	"crypto/tls"
-	log "github.com/Pivotal-Japan/firehose-to-fluentd/logging"
 	"github.com/cloudfoundry/noaa"
 	"github.com/cloudfoundry/sonde-go/events"
+	log "github.com/shinji62/firehose-to-fluentd/logging"
 )
 
 func CreateFirehoseChan(DopplerEndpoint string, Token string, subId string, skipSSLValidation bool) chan *events.Envelope {

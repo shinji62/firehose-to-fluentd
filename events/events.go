@@ -2,11 +2,11 @@ package events
 
 import (
 	"fmt"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/caching"
-	log "github.com/Pivotal-Japan/firehose-to-fluentd/logging"
-	"github.com/Pivotal-Japan/firehose-to-fluentd/utils"
 	"github.com/Sirupsen/logrus"
 	"github.com/cloudfoundry/sonde-go/events"
+	"github.com/shinji62/firehose-to-fluentd/caching"
+	log "github.com/shinji62/firehose-to-fluentd/logging"
+	"github.com/shinji62/firehose-to-fluentd/utils"
 	"strings"
 	"sync"
 	"time"
@@ -57,9 +57,9 @@ func routeEvent(msg *events.Envelope, extraFields map[string]string) {
 			event = ContainerMetric(msg)
 		}
 
-		event.AnnotateWithMetaData(extraFields)
 		event.AnnotateWithAppData()
-
+		event.AnnotateWithMetaData(extraFields)
+		event.AnnotateWithTag()
 		mutex.Lock()
 		event.ShipEvent()
 		selectedEventsCount[eventType.String()]++
@@ -139,7 +139,6 @@ func HttpStart(msg *events.Envelope) Event {
 		"timestamp":         httpStart.GetTimestamp(),
 		"uri":               httpStart.GetUri(),
 		"user_agent":        httpStart.GetUserAgent(),
-		"tag":               "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -161,7 +160,6 @@ func HttpStop(msg *events.Envelope) Event {
 		"status_code":    httpStop.GetStatusCode(),
 		"timestamp":      httpStop.GetTimestamp(),
 		"uri":            httpStop.GetUri(),
-		"tag":            "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -191,7 +189,6 @@ func HttpStartStop(msg *events.Envelope) Event {
 		"uri":               httpStartStop.GetUri(),
 		"user_agent":        httpStartStop.GetUserAgent(),
 		"duration_ms":       (((httpStartStop.GetStopTimestamp() - httpStartStop.GetStartTimestamp()) / 1000) / 1000),
-		"tag":               "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -211,7 +208,6 @@ func LogMessage(msg *events.Envelope) Event {
 		"source_type":     logMessage.GetSourceType(),
 		"message_type":    logMessage.GetMessageType().String(),
 		"source_instance": logMessage.GetSourceInstance(),
-		"tag":             utils.ConcatFormat([]string{"cf", "LogMessage", logMessage.GetSourceType(), logMessage.GetMessageType().String()}),
 	}
 
 	return Event{
@@ -229,7 +225,6 @@ func ValueMetric(msg *events.Envelope) Event {
 		"name":   valMetric.GetName(),
 		"unit":   valMetric.GetUnit(),
 		"value":  valMetric.GetValue(),
-		"tag":    "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -247,7 +242,6 @@ func CounterEvent(msg *events.Envelope) Event {
 		"name":   counterEvent.GetName(),
 		"delta":  counterEvent.GetDelta(),
 		"total":  counterEvent.GetTotal(),
-		"tag":    "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -264,7 +258,6 @@ func ErrorEvent(msg *events.Envelope) Event {
 		"origin": msg.GetOrigin(),
 		"code":   errorEvent.GetCode(),
 		"delta":  errorEvent.GetSource(),
-		"tag":    "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -284,7 +277,6 @@ func ContainerMetric(msg *events.Envelope) Event {
 		"disk_bytes":     containerMetric.GetDiskBytes(),
 		"instance_index": containerMetric.GetInstanceIndex(),
 		"memory_bytes":   containerMetric.GetMemoryBytes(),
-		"tag":            "cf." + msg.GetEventType().String(),
 	}
 
 	return Event{
@@ -298,8 +290,6 @@ func (e *Event) AnnotateWithAppData() {
 
 	cf_app_id := e.Fields["cf_app_id"]
 	appGuid := ""
-	cluster := e.Fields["cluster"].(string)
-	domain := e.Fields["domain"].(string)
 
 	if cf_app_id != nil {
 		appGuid = fmt.Sprintf("%s", cf_app_id)
@@ -332,11 +322,6 @@ func (e *Event) AnnotateWithAppData() {
 		if cf_org_name != "" {
 			e.Fields["cf_org_name"] = cf_org_name
 		}
-		e.Fields["m_host"] = utils.ConcatFormat([]string{cluster, cf_org_name, cf_space_name, cf_app_name}) + "." + domain
-
-	} else {
-		e.Fields["m_host"] = utils.ConcatFormat([]string{cluster}) + "." + domain
-
 	}
 }
 
@@ -400,5 +385,8 @@ func getEventTotals(totalElapsedTime float64, elapsedTime float64, lastCount uin
 	}
 
 	event.Fields = fields
+	//	for event, count := range selectedEvents {
+	//		event.Fields[event] = count
+	//	}
 	return event, totalCount
 }

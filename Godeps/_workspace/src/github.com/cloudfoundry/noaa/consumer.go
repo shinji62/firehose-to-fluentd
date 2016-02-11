@@ -42,7 +42,6 @@ type Consumer struct {
 	callback             func()
 	proxy                func(*http.Request) (*url.URL, error)
 	debugPrinter         DebugPrinter
-	idleTimeout          time.Duration
 	sync.RWMutex
 	stopChan chan struct{}
 }
@@ -125,10 +124,6 @@ func (cnsmr *Consumer) Firehose(subscriptionId string, authToken string, outputC
 	}
 
 	cnsmr.retryAction(action, errorChan)
-}
-
-func (cnsmr *Consumer) SetIdleTimeout(idleTimeout time.Duration) {
-	cnsmr.idleTimeout = idleTimeout
 }
 
 // FirehoseWithoutReconnect streams all data. All clients with the same subscriptionId will receive a proportionate share of the
@@ -329,9 +324,6 @@ func (cnsmr *Consumer) listenForMessages(msgChan chan<- *events.Envelope) error 
 	defer cnsmr.ws.Close()
 
 	for {
-		if cnsmr.idleTimeout != 0 {
-			cnsmr.ws.SetReadDeadline(time.Now().Add(cnsmr.idleTimeout))
-		}
 		_, data, err := cnsmr.ws.ReadMessage()
 		if err != nil {
 			return err

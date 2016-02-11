@@ -34,7 +34,6 @@ func main() {
 ### Developing & Contributing
 
 You can use Godep to restor the dependency
-Tested with go1.5.3
 ```bash
 godep go build
 ```

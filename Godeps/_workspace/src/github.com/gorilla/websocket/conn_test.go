@@ -5,13 +5,11 @@
 package websocket
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
-	"reflect"
 	"testing"
 	"testing/iotest"
 	"time"
@@ -148,15 +146,13 @@ func TestControl(t *testing.T) {
 func TestCloseBeforeFinalFrame(t *testing.T) {
 	const bufSize = 512
 
-	expectedErr := &CloseError{Code: CloseNormalClosure, Text: "hello"}
-
 	var b1, b2 bytes.Buffer
 	wc := newConn(fakeNetConn{Reader: nil, Writer: &b1}, false, 1024, bufSize)
 	rc := newConn(fakeNetConn{Reader: &b1, Writer: &b2}, true, 1024, 1024)
 
 	w, _ := wc.NextWriter(BinaryMessage)
 	w.Write(make([]byte, bufSize+bufSize/2))
-	wc.WriteControl(CloseMessage, FormatCloseMessage(expectedErr.Code, expectedErr.Text), time.Now().Add(10*time.Second))
+	wc.WriteControl(CloseMessage, FormatCloseMessage(CloseNormalClosure, ""), time.Now().Add(10*time.Second))
 	w.Close()
 
 	op, r, err := rc.NextReader()
@@ -164,12 +160,12 @@ func TestCloseBeforeFinalFrame(t *testing.T) {
 		t.Fatalf("NextReader() returned %d, %v", op, err)
 	}
 	_, err = io.Copy(ioutil.Discard, r)
-	if !reflect.DeepEqual(err, expectedErr) {
-		t.Fatalf("io.Copy() returned %v, want %v", err, expectedErr)
+	if err != errUnexpectedEOF {
+		t.Fatalf("io.Copy() returned %v, want %v", err, errUnexpectedEOF)
 	}
 	_, _, err = rc.NextReader()
-	if !reflect.DeepEqual(err, expectedErr) {
-		t.Fatalf("NextReader() returned %v, want %v", err, expectedErr)
+	if err != io.EOF {
+		t.Fatalf("NextReader() returned %v, want %v", err, io.EOF)
 	}
 }
 
@@ -238,35 +234,5 @@ func TestUnderlyingConn(t *testing.T) {
 	ul := c.UnderlyingConn()
 	if ul != fc {
 		t.Fatalf("Underlying conn is not what it should be.")
-	}
-}
-
-func TestBufioReadBytes(t *testing.T) {
-
-	// Test calling bufio.ReadBytes for value longer than read buffer size.
-
-	m := make([]byte, 512)
-	m[len(m)-1] = '\n'
-
-	var b1, b2 bytes.Buffer
-	wc := newConn(fakeNetConn{Reader: nil, Writer: &b1}, false, len(m)+64, len(m)+64)
-	rc := newConn(fakeNetConn{Reader: &b1, Writer: &b2}, true, len(m)-64, len(m)-64)
-
-	w, _ := wc.NextWriter(BinaryMessage)
-	w.Write(m)
-	w.Close()
-
-	op, r, err := rc.NextReader()
-	if op != BinaryMessage || err != nil {
-		t.Fatalf("NextReader() returned %d, %v", op, err)
-	}
-
-	br := bufio.NewReader(r)
-	p, err := br.ReadBytes('\n')
-	if err != nil {
-		t.Fatalf("ReadBytes() returned %v", err)
-	}
-	if len(p) != len(m) {
-		t.Fatalf("read returnd %d bytes, want %d bytes", len(p), len(m))
 	}
 }

@@ -3,27 +3,19 @@ package logstash
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/Sirupsen/logrus"
+	"time"
 )
 
 // Formatter generates json in logstash format.
 // Logstash site: http://logstash.net/
 type LogstashFormatter struct {
 	Type string // if not empty use for logstash type field.
-
-	// TimestampFormat sets the format used for timestamps.
-	TimestampFormat string
 }
 
 func (f *LogstashFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	entry.Data["@version"] = 1
-
-	if f.TimestampFormat == "" {
-		f.TimestampFormat = logrus.DefaultTimestampFormat
-	}
-
-	entry.Data["@timestamp"] = entry.Time.Format(f.TimestampFormat)
+	entry.Data["@timestamp"] = entry.Time.Format(time.RFC3339)
 
 	// set message field
 	v, ok := entry.Data["message"]

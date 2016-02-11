@@ -256,15 +256,6 @@ var unMarshalTextTests = []UnmarshalTextTest{
 		},
 	},
 
-	// Repeated field with list notation
-	{
-		in: `count:42 pet: ["horsey", "bunny"]`,
-		out: &MyMessage{
-			Count: Int32(42),
-			Pet:   []string{"horsey", "bunny"},
-		},
-	},
-
 	// Repeated message with/without colon and <>/{}
 	{
 		in: `count:42 others:{} others{} others:<> others:{}`,
@@ -487,18 +478,6 @@ func TestMapParsing(t *testing.T) {
 			true: []byte("so be it"),
 		},
 	}
-	if err := UnmarshalText(in, m); err != nil {
-		t.Fatal(err)
-	}
-	if !Equal(m, want) {
-		t.Errorf("\n got %v\nwant %v", m, want)
-	}
-}
-
-func TestOneofParsing(t *testing.T) {
-	const in = `name:"Shrek"`
-	m := new(Communique)
-	want := &Communique{Union: &Communique_Name{"Shrek"}}
 	if err := UnmarshalText(in, m); err != nil {
 		t.Fatal(err)
 	}

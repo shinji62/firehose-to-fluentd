@@ -49,12 +49,13 @@ func (a *argGroup) init() error {
 }
 
 type ArgClause struct {
-	actionMixin
 	parserMixin
 	name         string
 	help         string
 	defaultValue string
 	required     bool
+	action       Action
+	preAction    Action
 }
 
 func newArg(name, help string) *ArgClause {
@@ -85,12 +86,12 @@ func (a *ArgClause) Default(value string) *ArgClause {
 }
 
 func (a *ArgClause) Action(action Action) *ArgClause {
-	a.addAction(action)
+	a.action = action
 	return a
 }
 
 func (a *ArgClause) PreAction(action Action) *ArgClause {
-	a.addPreAction(action)
+	a.preAction = action
 	return a
 }
 
