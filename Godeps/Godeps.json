@@ -1,6 +1,6 @@
 {
-	"ImportPath": "github.com/shinji62/firehose-to-fluentd",
-	"GoVersion": "go1.5.3",
+	"ImportPath": "github.com/Pivotal-Japan/firehose-to-fluentd",
+	"GoVersion": "go1.6",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",

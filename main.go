@@ -100,7 +100,9 @@ func main() {
 
 	//Let's start the goRoutine
 	caching.PerformPoollingCaching(*tickerTime)
-	caching.PerformStat()
+	if *debug == true {
+		caching.PerformStat()
+	}
 
 	// Parse extra fields from cmd call
 	extraFields, err := extrafields.ParseExtraFields(*extraFields)

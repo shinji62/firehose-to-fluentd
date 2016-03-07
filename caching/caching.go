@@ -56,7 +56,7 @@ func PerformStat() {
 			time.Sleep(60 * time.Second)
 			stats := appdb.Stats()
 			diff := stats.Sub(&prev)
-			json.NewEncoder(os.Stderr).Encode(diff)
+			json.NewEncoder(os.Stdout).Encode(diff)
 			prev = stats
 		}
 	}()
