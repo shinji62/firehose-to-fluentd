@@ -65,7 +65,7 @@ We have 3 caching strategies:
 * Pull application data if not cached yet.
 * Pull all application data every "cc-pull-time".
 
-# To test and build (Tested with go 1.5.X)
+# To test and build (Tested with go > 1.5.X)
 
 
     # Setup repo
